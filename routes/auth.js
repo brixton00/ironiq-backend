@@ -29,7 +29,7 @@ router.post('/signup', async (req, res) => {
     return res.json({ result: false, error: 'Mot de passe trop court' });
   }
 
-  if (req.body.passaword.length !== req.body.passwordBis){
+  if (req.body.password.length !== req.body.passwordBis){
     return res.json({ result: false, error: 'Les mots de passe ne correspondent pas' });
   }
 
@@ -56,7 +56,7 @@ router.post('/signup', async (req, res) => {
 
     if (!emailSent) {
       await User.deleteOne({ _id: newUser._id });
-      return res.json({ result: true, message: "Compte créé mais échec de l'envoi d'email. veuillez réessayer plus tard ou contactez le support.", email: newUser.email });
+      return res.json({ result: false, message: "Compte créé mais échec de l'envoi d'email. veuillez réessayer plus tard ou contactez le support.", email: newUser.email });
     }
 
     res.json({ 
