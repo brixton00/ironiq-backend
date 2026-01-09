@@ -16,6 +16,7 @@ const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString(
 
 /* POST /signup : Création du compte (Statut non vérifié) */
 router.post('/signup', async (req, res) => {
+  console.log("📨 REQUÊTE REÇUE : Signup pour email =", req.body.email);
 
     if (!checkBody(req.body, ['username', 'password', 'passwordBis', 'email'])) {
     return res.json({ result: false, error: 'Champs manquants ou vides' });
