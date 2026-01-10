@@ -1,22 +1,21 @@
 const nodemailer = require('nodemailer');
 
-// 👇 LOG DE CONTRÔLE : On vérifie ce qui est chargé
-console.log("🔧 CONFIG MAILER CHARGÉE :");
-console.log(`   - User: ${process.env.EMAIL_USER}`);
-console.log(`   - Pass: ${process.env.EMAIL_PASS ? '******** (Présent)' : '❌ ABSENT'}`);
-console.log(`   - Port: 465 (Test SSL + IPv4)`);
+console.log("🔧 CONFIG MAILER : Passage au Port 587 (STARTTLS) + IPv4");
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,        // On retente le 465 (SSL) qui est souvent plus stable avec IPv4 forcé
-  secure: true,     // Vrai pour 465
+  port: 587,        // 👈 SEULE OPTION POSSIBLE (465 est bloqué)
+  secure: false,    // 👈 OBLIGATOIRE pour le port 587
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  family: 4,        // ⚠️ INDISPENSABLE : Force l'IPv4
-  logger: true,     // 🔍 ACTIVE LES LOGS DÉTAILLÉS NODEMAILER
-  debug: true,      // 🔍 AFFICHE TOUT LE TRAFIC SMTP
+  tls: {
+    rejectUnauthorized: false, // Aide à la compatibilité
+  },
+  family: 4,        // ⚠️ ON GARDE ÇA (C'est vital pour Railway)
+  logger: true,     // On garde les logs pour vérifier
+  debug: true,
 });
 
 const sendVerificationEmail = async (userEmail, code) => {
@@ -24,18 +23,22 @@ const sendVerificationEmail = async (userEmail, code) => {
     from: `"IronIQ Security" <${process.env.EMAIL_USER}>`,
     to: userEmail,
     subject: 'Votre code de vérification IronIQ',
-    html: `<h1>Code: ${code}</h1>`,
+    html: `
+      <div style="font-family: Arial, sans-serif;">
+        <h1>Code IronIQ : ${code}</h1>
+        <p>Ce code expire dans 15 minutes.</p>
+      </div>
+    `,
   };
 
-  console.log(`📨 Tentative d'envoi à ${userEmail}...`);
+  console.log(`📨 Tentative via Port 587 vers ${userEmail}...`);
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email envoyé avec succès ! ID:', info.messageId);
+    console.log('✅ Email envoyé ! ID:', info.messageId);
     return true;
   } catch (error) {
-    console.error('❌ ECHEC CRITIQUE ENVOI EMAIL :');
-    console.error(error);
+    console.error('❌ ERREUR 587 :', error);
     return false;
   }
 };
