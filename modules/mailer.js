@@ -1,17 +1,22 @@
 const nodemailer = require('nodemailer');
 
+// 👇 LOG DE CONTRÔLE : On vérifie ce qui est chargé
+console.log("🔧 CONFIG MAILER CHARGÉE :");
+console.log(`   - User: ${process.env.EMAIL_USER}`);
+console.log(`   - Pass: ${process.env.EMAIL_PASS ? '******** (Présent)' : '❌ ABSENT'}`);
+console.log(`   - Port: 465 (Test SSL + IPv4)`);
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,        // Port TLS
-  secure: false,    // STARTTLS
+  port: 465,        // On retente le 465 (SSL) qui est souvent plus stable avec IPv4 forcé
+  secure: true,     // Vrai pour 465
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  tls: {
-    rejectUnauthorized: false 
-  },
-  family: 4, // 👈 AJOUTE CECI (Force l'IPv4 pour éviter les Timeouts Railway)
+  family: 4,        // ⚠️ INDISPENSABLE : Force l'IPv4
+  logger: true,     // 🔍 ACTIVE LES LOGS DÉTAILLÉS NODEMAILER
+  debug: true,      // 🔍 AFFICHE TOUT LE TRAFIC SMTP
 });
 
 const sendVerificationEmail = async (userEmail, code) => {
@@ -19,24 +24,18 @@ const sendVerificationEmail = async (userEmail, code) => {
     from: `"IronIQ Security" <${process.env.EMAIL_USER}>`,
     to: userEmail,
     subject: 'Votre code de vérification IronIQ',
-    html: `
-      <div style="font-family: Arial, sans-serif; color: #333;">
-        <h1>Bienvenue sur IronIQ ! 🦾</h1>
-        <p>Merci de vous être inscrit. Voici votre code :</p>
-        <div style="background-color: #f4f4f4; padding: 15px; text-align: center; border-radius: 5px; font-size: 24px; letter-spacing: 5px; font-weight: bold;">
-          ${code}
-        </div>
-        <p>Valable 15 minutes.</p>
-      </div>
-    `,
+    html: `<h1>Code: ${code}</h1>`,
   };
+
+  console.log(`📨 Tentative d'envoi à ${userEmail}...`);
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email envoyé: ' + info.response);
+    console.log('✅ Email envoyé avec succès ! ID:', info.messageId);
     return true;
   } catch (error) {
-    console.error('❌ Erreur envoi email:', error);
+    console.error('❌ ECHEC CRITIQUE ENVOI EMAIL :');
+    console.error(error);
     return false;
   }
 };
