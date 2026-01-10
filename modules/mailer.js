@@ -1,4 +1,64 @@
-const nodemailer = require('nodemailer');
+// MODULE MAILER VIA API HTTP (BREVO)
+// Documentation : https://developers.brevo.com/reference/sendtransacemail
+
+const sendVerificationEmail = async (userEmail, code) => {
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.EMAIL_USER;
+
+  if (!apiKey) {
+    console.error("❌ ERREUR : La variable BREVO_API_KEY est manquante.");
+    return false;
+  }
+
+  const url = 'https://api.brevo.com/v3/smtp/email';
+  
+  const body = {
+    sender: { name: "IronIQ Security: Mail Verification", email: senderEmail },
+    to: [{ email: userEmail }],
+    subject: "Votre code de vérification IronIQ",
+    htmlContent: `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <h1>Bienvenue sur IronIQ ! 🦾</h1>
+        <p>Pour valider votre compte, voici votre code :</p>
+        <div style="background-color: #f4f4f4; padding: 15px; text-align: center; border-radius: 5px; font-size: 24px; letter-spacing: 5px; font-weight: bold;">
+          ${code}
+        </div>
+        <p>Ce code est valable 15 minutes.</p>
+      </div>
+    ` 
+  };
+
+  console.log(`📨 Envoi via API HTTP vers ${userEmail}...`);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('✅ Email envoyé via API ! Message ID:', data.messageId);
+      return true;
+    } else {
+      console.error('❌ Erreur API Brevo :', data);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Erreur Réseau (Fetch) :', error);
+    return false;
+  }
+};
+
+module.exports = { sendVerificationEmail };
+
+/*const nodemailer = require('nodemailer');
 
 console.log("🔧 CONFIG MAILER : Passage au Port 587 (STARTTLS) + IPv4");
 
@@ -43,4 +103,4 @@ const sendVerificationEmail = async (userEmail, code) => {
   }
 };
 
-module.exports = { sendVerificationEmail };
+module.exports = { sendVerificationEmail };*/
