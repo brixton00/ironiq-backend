@@ -1,11 +1,16 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE,
+  host: 'smtp.gmail.com',
+  port: 587,        // 👈 CHANGEMENT 1 : On passe au port TLS
+  secure: false,    // 👈 CHANGEMENT 2 : false (car le cryptage STARTTLS se lance après la connexion)
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false // Optionnel : Aide parfois à passer les pare-feux stricts
+  }
 });
 
 const sendVerificationEmail = async (userEmail, code) => {
