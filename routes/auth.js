@@ -30,7 +30,7 @@ router.post('/signup', async (req, res) => {
     return res.json({ result: false, error: 'Mot de passe trop court' });
   }
 
-  if (req.body.password.length !== req.body.passwordBis){
+  if (req.body.password !== req.body.passwordBis){
     return res.json({ result: false, error: 'Les mots de passe ne correspondent pas' });
   }
 
