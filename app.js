@@ -1,4 +1,4 @@
-require('dotenv').config(); 
+require('dotenv').config();
 require('./models/connection');
 const express = require('express');
 const cors = require('cors');
@@ -9,25 +9,44 @@ const mongoSanitize = require('express-mongo-sanitize');
 const authRouter = require('./routes/auth');
 
 const app = express();
-app.set('trust proxy', 1);
-app.use(helmet());
-app.use(cors()); 
 
+// config proxy 
+app.set('trust proxy', 1);
+
+// sécurité Headers & CORS
+app.use(helmet());
+app.use(cors());
+
+// rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100, 
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
 });
-
 app.use(limiter);
-app.use(express.json()); 
+
+// parsing des données
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// PATCH EXPRESS 5 (fix spécifique pour éviter crash sur req.query)
+app.use((req, res, next) => {
+  Object.defineProperty(req, 'query', {
+    writable: true,
+    configurable: true,
+    value: req.query
+  });
+  next();
+});
+
+// nettoyage NoSQL
 app.use(mongoSanitize());
 
+// routes
 app.use('/auth', authRouter);
 
-// Route de test 
+// route de test
 app.get('/', (req, res) => {
   res.json({ result: true, message: 'IronIQ Backend is running 🚀' });
 });

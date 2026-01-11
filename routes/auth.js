@@ -22,13 +22,27 @@ router.post('/signup', async (req, res) => {
     return res.json({ result: false, error: 'Champs manquants ou vides' });
   }
 
+  const usernameRegex = /^[a-zA-Z0-9]+$/;
+
+  if (!usernameRegex.test(req.body.username)) {
+    return res.json({ 
+      result: false, 
+      error: "Le nom d'utilisateur ne peut contenir que des lettres et des chiffres sans espaces." 
+    });
+  }
+
   if (!validator.isEmail(req.body.email)) {
     return res.json({ result: false, error: 'Email invalide' });
   }
 
-  if (req.body.password.length < 8){
-    return res.json({ result: false, error: 'Mot de passe trop court' });
-  }
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+  if (!passwordRegex.test(req.body.password)) {
+  return res.json({ 
+    result: false, 
+    error: 'Mot de passe trop faible : min. 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.' 
+  });
+}
 
   if (req.body.password !== req.body.passwordBis){
     return res.json({ result: false, error: 'Les mots de passe ne correspondent pas' });
@@ -95,10 +109,41 @@ router.post('/verify', async (req, res) => {
       { expiresIn: '30d' }
     );
     
-    user.token = token;
+    //user.token = token;
     await user.save();
 
     res.json({ result: true, token: token, username: user.username });
+
+  } catch (error) {
+    res.status(500).json({ result: false, error: error.message });
+  }
+});
+
+/* POST /signin : Connexion utilisateur */
+router.post('/signin', async (req, res) => {
+  if (!checkBody(req.body, ['identifier', 'password'])) {
+    return res.json({ result: false, error: 'Champs manquants ou vides' });
+  }
+
+  try {
+    const user = await User.findOne({ 
+      $or: [
+        { email: req.body.identifier.toLowerCase() }, 
+        { username: req.body.identifier } 
+      ]
+    });
+
+    if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
+      return res.json({ result: false, error: 'Identifiants incorrects' });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, username: user.username }, 
+      process.env.JWT_SECRET || 'SECRET_TEMPORAIRE', 
+      { expiresIn: '30d' }
+    );
+
+    res.json({ result: true, token, username: user.username });
 
   } catch (error) {
     res.status(500).json({ result: false, error: error.message });
