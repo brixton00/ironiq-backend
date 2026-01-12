@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 
 const authRouter = require('./routes/auth');
+const generatorRouter = require('./routes/generator');
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use(mongoSanitize());
 
 // routes
 app.use('/auth', authRouter);
+app.use('/gpt', generatorRouter);
 
 // route de test
 app.get('/', (req, res) => {
