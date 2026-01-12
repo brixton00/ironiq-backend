@@ -1,5 +1,6 @@
 const Program = require('../models/programs');
 const Template = require('../models/templates');
+const WorkoutLog = require('../models/workoutLogs');
 
 // endpoint route GET /my-programs
 const getMyPrograms = async (req, res) => {
@@ -23,15 +24,13 @@ const getTemplates = async (req, res) => {
   }
 };
 
-const WorkoutLog = require('../models/workoutLogs');
-
-// ... (fonctions existantes getMyPrograms, getTemplates)
-
+// endpoint route POST /log-dession
 const logSession = async (req, res) => {
   try {
-    const { programId, dayName, exercises } = req.body;
+    // On récupère dayIndex depuis le frontend (ajouté à l'étape 3)
+    const { programId, dayName, exercises, dayIndex } = req.body;
 
-    // Création du log de séance
+    // 1. Sauvegarde du Log (Historique)
     const newLog = new WorkoutLog({
       user: req.user._id,
       program: programId,
@@ -39,17 +38,25 @@ const logSession = async (req, res) => {
       exercises: exercises,
       date: new Date()
     });
-
     await newLog.save();
 
-    // compte le nombre de logs pour ce programme)
-    const logCount = await WorkoutLog.countDocuments({ user: req.user._id, program: programId });
-    
-    // récupère le programme pour connaître sa fréquence
+    // 2. Mise à jour sécurisée du Programme
     const program = await Program.findById(programId);
-    
-    // si nombre de séances faites >= fréquence hebdo -> SEMAINE TERMINÉE
-    const isWeekComplete = logCount >= program.frequency;
+
+    // 🛡️ ANTI-ICHEAT : On ajoute l'index SEULEMENT s'il n'existe pas déjà
+    // $addToSet de MongoDB ferait pareil, mais ici on le fait en JS pour vérifier la longueur ensuite
+    if (!program.completedDays.includes(dayIndex)) {
+      program.completedDays.push(dayIndex);
+    }
+
+    // Vérification : La semaine est finie si le nombre de jours UNIQUES validés >= Fréquence
+    let isWeekComplete = false;
+    if (program.completedDays.length >= program.frequency) {
+      isWeekComplete = true;
+      program.isWeekComplete = true; // On persiste l'état final
+    }
+
+    await program.save();
 
     res.json({ result: true, message: 'Séance enregistrée', isWeekComplete });
 

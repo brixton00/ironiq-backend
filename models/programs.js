@@ -27,9 +27,10 @@ const programSchema = mongoose.Schema({
   goal: String,
   frequency: Number,
   schedule: [daySchema], // Tableau de jours
-  
+  completedDays: { type: [Number], default: [] }, //pour éviter les doublons
+  isWeekComplete: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
-  isActive: { type: Boolean, default: true } // Pour savoir quel est le programme en cours
+  isActive: { type: Boolean, default: true } 
 });
 
 const Program = mongoose.model('programs', programSchema);
