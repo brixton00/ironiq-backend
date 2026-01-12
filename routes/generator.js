@@ -36,7 +36,13 @@ const ProgramSchema = z.object({
 router.post('/generate', async (req, res) => {
   try {
     const { userData, userId } = req.body;
+    
     console.log("⏳ Génération en cours pour l'utilisateur :", userId || "Anonyme");
+    console.log("🔍 INSPECTION OPENAI :", {
+       type: typeof openai,
+       hasBeta: !!openai.beta,
+       keys: Object.keys(openai)
+    });
 
     const completion = await openai.beta.chat.completions.parse({
       model: "gpt-4o-2024-08-06",
