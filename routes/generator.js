@@ -15,7 +15,7 @@ const WorkoutExerciseSchema = z.object({
   reps: z.string().describe("Plage de répétitions adaptée à l'exercice, ex: '8-12'"),
   rpe: z.number().describe("Rating of Perceived Exertion: Effort perçu sur 10, minimum 7, maximum 10"),
   rest: z.number().describe("Temps de repos en secondes"),
-  tempo: z.string().optional().describe("Cadence d'éxécution, seulement si nécessaire, ex: 3-0-1-0"),
+  //tempo: z.string().optional().describe("Cadence d'éxécution, seulement si nécessaire, ex: 3-0-1-0"),
   note: z.string().describe("Conseil technique et/ou optimisation pour la performance ou l'hypertrophie")
 });
 
