@@ -11,6 +11,15 @@ const generatorRouter = require('./routes/generator');
 
 const app = express();
 
+try {
+  const openaiVersion = require('openai/package.json').version;
+  console.log(`🔍 --------------------------------------------------`);
+  console.log(`🔍 DIAGNOSTIC VERSION OPENAI : ${openaiVersion}`);
+  console.log(`🔍 --------------------------------------------------`);
+} catch (e) {
+  console.log("🔍 IMPOSSIBLE DE LIRE LA VERSION OPENAI");
+}
+
 // config proxy 
 app.set('trust proxy', 1);
 
