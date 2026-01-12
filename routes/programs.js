@@ -9,4 +9,7 @@ router.get('/my-programs', protect, programsController.getMyPrograms);
 // GET /templates
 router.get('/templates', protect, programsController.getTemplates);
 
+// POST /log-session
+router.post('/log-session', protect, programsController.logSession);
+
 module.exports = router;

@@ -23,4 +23,40 @@ const getTemplates = async (req, res) => {
   }
 };
 
-module.exports = { getMyPrograms, getTemplates };
+const WorkoutLog = require('../models/workoutLogs');
+
+// ... (fonctions existantes getMyPrograms, getTemplates)
+
+const logSession = async (req, res) => {
+  try {
+    const { programId, dayName, exercises } = req.body;
+
+    // Création du log de séance
+    const newLog = new WorkoutLog({
+      user: req.user._id,
+      program: programId,
+      dayName: dayName,
+      exercises: exercises,
+      date: new Date()
+    });
+
+    await newLog.save();
+
+    // compte le nombre de logs pour ce programme)
+    const logCount = await WorkoutLog.countDocuments({ user: req.user._id, program: programId });
+    
+    // récupère le programme pour connaître sa fréquence
+    const program = await Program.findById(programId);
+    
+    // si nombre de séances faites >= fréquence hebdo -> SEMAINE TERMINÉE
+    const isWeekComplete = logCount >= program.frequency;
+
+    res.json({ result: true, message: 'Séance enregistrée', isWeekComplete });
+
+  } catch (error) {
+    res.status(500).json({ result: false, error: error.message });
+  }
+};
+
+module.exports = { getMyPrograms, getTemplates, logSession };
+
