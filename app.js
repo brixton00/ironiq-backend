@@ -8,17 +8,9 @@ const mongoSanitize = require('express-mongo-sanitize');
 
 const authRouter = require('./routes/auth');
 const generatorRouter = require('./routes/generator');
+const programsRouter = require('./routes/programs');
 
 const app = express();
-
-try {
-  const openaiVersion = require('openai/package.json').version;
-  console.log(`🔍 --------------------------------------------------`);
-  console.log(`🔍 DIAGNOSTIC VERSION OPENAI : ${openaiVersion}`);
-  console.log(`🔍 --------------------------------------------------`);
-} catch (e) {
-  console.log("🔍 IMPOSSIBLE DE LIRE LA VERSION OPENAI");
-}
 
 // config proxy 
 app.set('trust proxy', 1);
@@ -56,6 +48,7 @@ app.use(mongoSanitize());
 // routes
 app.use('/auth', authRouter);
 app.use('/gpt', generatorRouter);
+app.use('/programs', programsRouter);
 
 // route de test
 app.get('/', (req, res) => {
