@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const generatorController = require('../controllers/generator');
-const { protect } = require('../middleware/auth');
+const { protect } = require('../middlewares/auth');
 
 // POST /generate
 router.post('/generate', protect, generatorController.generateProgram);
