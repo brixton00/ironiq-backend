@@ -36,7 +36,7 @@ const ProgramSchema = z.object({
 router.post('/generate', async (req, res) => {
   try {
     const { userData, userId } = req.body;
-    
+
     console.log("⏳ Génération en cours pour l'utilisateur :", userId || "Anonyme");
     console.log("🔍 INSPECTION OPENAI :", {
        type: typeof openai,
@@ -59,7 +59,17 @@ router.post('/generate', async (req, res) => {
       response_format: zodResponseFormat(ProgramSchema, "workout_program"),
     });
 
-    const generatedData = completion.choices[0].message.parsed; 
+    const message = completion.choices[0].message;
+
+    if (message.refusal) {
+      console.warn("⚠️ Refus de l'IA :", message.refusal);
+      return res.status(400).json({ 
+        result: false, 
+        error: "Génération refusée: contenu inapproprié." 
+      });
+    }
+
+    const generatedData = message.parsed;
     
     const newProgram = new Program({
       user: userId ? userId : null, 
