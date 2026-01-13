@@ -9,6 +9,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const authRouter = require('./routes/auth');
 const generatorRouter = require('./routes/generator');
 const programsRouter = require('./routes/programs');
+const usersRouter = require('./routes/users');
 
 const app = express();
 
@@ -29,8 +30,8 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // parsing des données
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // PATCH EXPRESS 5 (fix spécifique pour éviter crash sur req.query)
 app.use((req, res, next) => {
@@ -49,6 +50,7 @@ app.use(mongoSanitize());
 app.use('/auth', authRouter);
 app.use('/gpt', generatorRouter);
 app.use('/programs', programsRouter);
+app.use('/users', usersRouter);
 
 // route de test
 app.get('/', (req, res) => {
