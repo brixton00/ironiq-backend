@@ -18,6 +18,8 @@ const userSchema = mongoose.Schema({
   verificationCode: { type: String }, 
   
   //META
+  avatar: { type: String, default: '' }, 
+  bio: { type: String, maxLength: 140, default: '' }, 
   createdAt: { type: Date, default: Date.now },
 
 });
