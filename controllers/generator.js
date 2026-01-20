@@ -2,7 +2,7 @@ const OpenAI = require('openai');
 const { z } = require('zod');
 const { zodResponseFormat } = require('openai/helpers/zod');
 const Program = require('../models/programs');
-const WorkoutLog = require('../models/workoutLog');
+const WorkoutLog = require('../models/workoutLogs');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
