@@ -197,7 +197,7 @@ const generateProgram = async (req, res) => {
     });
 
     // Semaines futures
-    generatedData.FutureWeeksPlan.forEach(week => {
+    generatedData.future_weeks_plan.forEach(week => {
       weeks.push({
         weekNumber: week.week_number,
         overview: week.overview,
