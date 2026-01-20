@@ -65,5 +65,27 @@ const logSession = async (req, res) => {
   }
 };
 
-module.exports = { getMyPrograms, getTemplates, logSession };
+// endpoint route DELETE /:id
+const deleteProgram = async (req, res) => {
+  try {
+    // Sécurité : On vérifie que le programme appartient bien à l'utilisateur qui fait la requête
+    const result = await Program.findOneAndDelete({ 
+      _id: req.params.id, 
+      user: req.user._id 
+    });
+
+    if (!result) {
+      return res.status(404).json({ result: false, error: "Programme introuvable ou non autorisé." });
+    }
+
+    // Optionnel : Nettoyage des logs associés (WorkoutLog) pour éviter les orphelins
+    // await WorkoutLog.deleteMany({ program: req.params.id });
+
+    res.json({ result: true, message: "Programme supprimé avec succès." });
+  } catch (error) {
+    res.status(500).json({ result: false, error: error.message });
+  }
+};
+
+module.exports = { getMyPrograms, getTemplates, logSession, deleteProgram };
 

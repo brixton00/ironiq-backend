@@ -12,4 +12,7 @@ router.get('/templates', protect, programsController.getTemplates);
 // POST /log-session
 router.post('/log-session', protect, programsController.logSession);
 
+// DELETE /:id
+router.delete('/:id', protect, programsController.deleteProgram);
+
 module.exports = router;
