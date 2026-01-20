@@ -12,7 +12,7 @@ const ExerciseSchema = z.object({
   sets: z.number().describe("Nombre de séries de travail, compris entre 2 et 6"),
   reps: z.string().describe("Plage de répétitions cible, ex: '🎯 8-12 reps' ou '🎯 5 reps'"),
   intensity_target: z.number().describe("L'intensité cible, ex: '8'"),
-  percentage_1rm: z.number().nullable.describe("Pourcentage du 1RM pour les exercices pertinents, ex: '0.75' pour 75% de la charge maximale"),
+  percentage_1rm: z.number().nullable().describe("Pourcentage du 1RM pour les exercices pertinents, ex: '0.75' pour 75% de la charge maximale"),
   set_type: z.string().nullable().describe("'Top Set(s)' ou 'Back-off Set(s)', uniquement si pertinence de programmation"),
   load: z.number().nullable().describe("Charge calculée en kg, d'après % du 1RM et/ou RPE si possible, sinon 'null'"),
   rest: z.number().describe("Intervalle de repos en secondes"),
