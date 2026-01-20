@@ -1,36 +1,67 @@
 const mongoose = require('mongoose');
 
-// Sous-document : Exercice
+// Niveau 4 : exercice
 const exerciseSchema = mongoose.Schema({
-  name: String,
-  sets: Number,
-  reps: String,
-  rpe: Number,
-  rest: Number,
-  tempo: String,
-  note: String,
+  name: { type: String, required: true },
+  sets: { type: Number, required: true },
+  reps: { type: String, required: true },
+  load: { type: Number, default: null }, 
+  intensityTarget: { type: String, required: true },
+  percentage1RM: { type: Number, default: null },
+  setType: { type: String, default: null },
+  rest: { type: Number },
+  notes: { type: String },
+  substitutionReason: { type: String, default: null },
 });
 
-// Sous-document : Journée d'entraînement
-const daySchema = mongoose.Schema({
-  dayName: String,
-  focus: String,
-  exercises: [exerciseSchema], // Tableau d'exercices
+// Niveau 3 : séance
+const sessionSchema = mongoose.Schema({
+  sessionName: { type: String, required: true },
+  focus: { type: String },
+  workoutDuration: { type: String, required: true},
+  exercises: [exerciseSchema], 
 });
 
-// Document Principal : Le Programme
-const programSchema = mongoose.Schema({
-  // 🔗 La liaison avec l'utilisateur (Clé Étrangère)
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
-  
-  programName: String,
-  goal: String,
-  frequency: Number,
-  schedule: [daySchema], // Tableau de jours
-  completedDays: { type: [Number], default: [] }, //pour éviter les doublons
+// Niveau 2 : semaine 
+const microcycleSchema = mongoose.Schema({
+  weekNumber: { type: Number, required: true },
+  overview: { type: String },
+  sessions: { type: [sessionSchema], default: [] }, 
+  completedSessions: { type: [Number], default: [] }, 
   isWeekComplete: { type: Boolean, default: false },
+  isGenerated: { type: Boolean, default: false } 
+});
+
+// Niveau 1 : programme
+const programSchema = mongoose.Schema({
+
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
+
+  programName: { type: String, required: true },
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
-  isActive: { type: Boolean, default: true } 
+  totalDurationWeeks: { type: Number, required: true }, 
+  aiReasoning: { type: String },
+
+  gender: { type: String, required: true },
+  age: { type: Number, required: true },
+  goal: { type: String, required: true }, 
+  anatomicalFocus: { type: String, default: null },
+  frequency: { type: Number, required: true }, 
+  level: { type: String, required: true }, 
+  split: { type: String, default: null },
+  kcal: { type: String, required: true }, 
+  equipment: { type: String, required: true },
+  timeAvailable: { type: String, required: true },
+  exercisesToInclude: { type: String, default: null },
+  exercisesToExclude: { type: String, default: null },
+  injuries: { type: String, default: null }, 
+  inquiries: { type: String, default: null },
+   
+  mesocycle: {
+    focus: String, // ???
+    weeks: [microcycleSchema]
+  },
 });
 
 const Program = mongoose.model('programs', programSchema);

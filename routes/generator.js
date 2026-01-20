@@ -6,7 +6,7 @@ const { protect } = require('../middlewares/auth');
 // POST /generate
 router.post('/generate', protect, generatorController.generateProgram);
 
-// POST /progress : update du programme
-// router.post('/progress', protect, generatorController.updateProgram);
+// POST /generate-next-week
+router.post('/generate-next-week', protect, generatorController.generateNextWeek);
 
 module.exports = router;
