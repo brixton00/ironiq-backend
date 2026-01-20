@@ -30,7 +30,7 @@ const SessionSchema = z.object({
 const InitialPlanSchema = z.object({
   reasoning: z.string(),
   program_name: z.string().describe("Un nom créatif et scientifique pour le programme"),
-  mesocycle_goal: z.string(),
+  mesocycle_overview: z.string("Description générale des objectifs et/ou de la structure du mesocycle"),
   total_duration_weeks: z.number().int().min(4).max(12),
   // détails UNIQUEMENT pour la semaine 1
   first_week_detailed: z.object({
@@ -229,7 +229,7 @@ const generateProgram = async (req, res) => {
       totalDurationWeeks: generatedData.total_duration_weeks,
       aiReasoning: generatedData.reasoning,
       mesocycle: {
-        goal: generatedData.mesocycle_goal,
+        overview: generatedData.mesocycle_overview,
         weeks: weeks
       },
 
@@ -377,7 +377,7 @@ const generateNextWeek = async (req, res) => {
           time_available: program.timeAvailable,
         },
         program_context: {
-          mesocycle_goal: program.mesocycle.goal,
+          mesocycle_overview: program.mesocycle.overview,
           current_week_number: targetWeek.week_number,
           week_goal: targetWeek.overview,
           total_duration: program.totalDurationWeeks,

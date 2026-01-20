@@ -58,7 +58,7 @@ const programSchema = mongoose.Schema({
   inquiries: { type: [String], default: [] },
    
   mesocycle: {
-    focus: { type: String, required: true }, // ???
+    overview: { type: String, required: true }, // ???
     weeks: [microcycleSchema]
   },
 });
