@@ -18,7 +18,6 @@ const exerciseSchema = mongoose.Schema({
 const sessionSchema = mongoose.Schema({
   sessionName: { type: String, required: true },
   focus: { type: String },
-  workoutDuration: { type: String, required: true},
   exercises: [exerciseSchema], 
 });
 
@@ -46,20 +45,20 @@ const programSchema = mongoose.Schema({
   gender: { type: String, required: true },
   age: { type: Number, required: true },
   goal: { type: String, required: true }, 
-  anatomicalFocus: { type: String, default: null },
+  anatomicalFocus: [{ type: String, default: null }],
   frequency: { type: Number, required: true }, 
   level: { type: String, required: true }, 
   split: { type: String, default: null },
   kcal: { type: String, required: true }, 
-  equipment: { type: String, required: true },
+  equipment: [{ type: String, required: true }],
   timeAvailable: { type: String, required: true },
-  exercisesToInclude: { type: String, default: null },
-  exercisesToExclude: { type: String, default: null },
-  injuries: { type: String, default: null }, 
-  inquiries: { type: String, default: null },
+  exercisesToInclude: [{ type: String, default: null }],
+  exercisesToExclude: [{ type: String, default: null }],
+  injuries: [{ type: String, default: null }], 
+  inquiries: [{ type: String, default: null }],
    
   mesocycle: {
-    focus: String, // ???
+    focus: { type: String, required: true }, // ???
     weeks: [microcycleSchema]
   },
 });
