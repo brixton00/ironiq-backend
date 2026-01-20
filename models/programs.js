@@ -5,11 +5,11 @@ const exerciseSchema = mongoose.Schema({
   name: { type: String, required: true },
   sets: { type: Number, required: true },
   reps: { type: String, required: true },
-  load: { type: Number, default: null }, 
-  intensityTarget: { type: String, required: true },
-  percentage1RM: { type: Number, default: null },
+  load: { type: Number, default: 0 }, 
+  intensityTarget: { type: Number, required: true },
+  percentage1RM: { type: Number, required: false, default: null },
   setType: { type: String, default: null },
-  rest: { type: Number },
+  rest: { type: Number, default: 180 },
   notes: { type: String },
   substitutionReason: { type: String, default: null },
 });
@@ -17,7 +17,7 @@ const exerciseSchema = mongoose.Schema({
 // Niveau 3 : séance
 const sessionSchema = mongoose.Schema({
   sessionName: { type: String, required: true },
-  focus: { type: String },
+  focus: { type: String, required: true },
   exercises: [exerciseSchema], 
 });
 
@@ -45,17 +45,17 @@ const programSchema = mongoose.Schema({
   gender: { type: String, required: true },
   age: { type: Number, required: true },
   goal: { type: String, required: true }, 
-  anatomicalFocus: [{ type: String, default: null }],
   frequency: { type: Number, required: true }, 
   level: { type: String, required: true }, 
   split: { type: String, default: null },
   kcal: { type: String, required: true }, 
-  equipment: [{ type: String, required: true }],
   timeAvailable: { type: String, required: true },
-  exercisesToInclude: [{ type: String, default: null }],
-  exercisesToExclude: [{ type: String, default: null }],
-  injuries: [{ type: String, default: null }], 
-  inquiries: [{ type: String, default: null }],
+  anatomicalFocus: { type: [String], default: [] },
+  equipment: { type: String, required: true }, 
+  exercisesToInclude: { type: [String], default: [] },
+  exercisesToExclude: { type: [String], default: [] },
+  injuries: { type: [String], default: [] }, 
+  inquiries: { type: [String], default: [] },
    
   mesocycle: {
     focus: { type: String, required: true }, // ???

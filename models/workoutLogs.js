@@ -17,7 +17,7 @@ const exerciseLogSchema = mongoose.Schema({
 const workoutLogSchema = mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
   program: { type: mongoose.Schema.Types.ObjectId, ref: 'programs', required: true, index: true },
-  dayName: { type: String, required: true },
+  sessionName: { type: String, required: true },
   weekNumber: { type: Number, required: true, index: true },
   date: { type: Date, default: Date.now },
   exercises: [exerciseLogSchema]

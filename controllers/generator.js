@@ -285,15 +285,15 @@ const generateNextWeek = async (req, res) => {
       const performanceAnalysis = lastWeekStructure ? lastWeekStructure.sessions.map((plannedSession, index) => {
 
         // recherche du log correspondant d'après le nom de séance
-        const matchingLog = lastWeekLogs.find(log => log.dayName === plannedSession.dayName);
+        const matchingLog = lastWeekLogs.find(log => log.sessionName === plannedSession.sessionName);
 
         // cas log absent aka séance non réalisée
         if (!matchingLog) {
-          return `SÉANCE #${index + 1} - '${plannedSession.dayName}' : NON RÉALISÉE.`;
+          return `SÉANCE #${index + 1} - '${plannedSession.sessionName}' : NON RÉALISÉE.`;
         }
 
         // cas séance réalisée
-        let sessionReport = `SÉANCE #${index + 1} - '${plannedSession.dayName}' : RÉALISÉE.`;
+        let sessionReport = `SÉANCE #${index + 1} - '${plannedSession.sessionName}' : RÉALISÉE.`;
         let exerciseDetails = [];
 
         plannedSession.exercises.forEach((plannedEx, i) => {
