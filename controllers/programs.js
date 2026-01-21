@@ -87,5 +87,25 @@ const deleteProgram = async (req, res) => {
   }
 };
 
-module.exports = { getMyPrograms, getTemplates, logSession, deleteProgram };
+// endpoint route GET /history
+const getHistory = async (req, res) => {
+  try {
+    // On récupère les logs de l'utilisateur, triés du plus récent au plus ancien
+    // On limite à 14 jours pour ne pas surcharger le mobile inutilement pour ce calcul
+    const limitDate = new Date();
+    limitDate.setDate(limitDate.getDate() - 14);
+
+    const logs = await WorkoutLog.find({ 
+      user: req.user._id,
+      date: { $gte: limitDate }
+    })
+    .sort({ date: -1 });
+
+    res.json({ result: true, logs });
+  } catch (error) {
+    res.status(500).json({ result: false, error: error.message });
+  }
+};
+
+module.exports = { getMyPrograms, getTemplates, logSession, deleteProgram, getHistory };
 

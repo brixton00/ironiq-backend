@@ -15,4 +15,7 @@ router.post('/log-session', protect, programsController.logSession);
 // DELETE /:id
 router.delete('/:id', protect, programsController.deleteProgram);
 
+// GET /history
+router.get('/history', protect, programsController.getHistory);
+
 module.exports = router;
