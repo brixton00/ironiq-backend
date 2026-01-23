@@ -8,6 +8,7 @@ const buildInitialUserPrompt = (userData) => {
     - Age : ${userData.age}
     - Sexe : ${userData.gender}
     - Objectif : ${userData.goal}
+    - EXERCICES CIBLES DE PROGRESSION (Mouvements Prioritaires) : ${userData.priorityProgression && userData.priorityProgression.length > 0 ? userData.priorityProgression.join(', ') : "Aucun"}
     - Contexte calorique : ${userData.kcal}
     - Fréquence d'entrainement souhaitée : ${userData.frequency}
     - Niveau de pratique : ${userData.level}
@@ -30,8 +31,11 @@ const buildInitialSystemPrompt = (goal) => {
     Générer un programme d'entraînement en résistance scientifique et détaillé pour l'utilisateur, basé sur son profil spécifique et les informations fournies. La sortie doit être un objet JSON structuré respectant strictement le schéma fourni.
     PRINCIPES SCIENTIFIQUES & HEURISTIQUES/
     1. Sélection d'Exercices :
+    ◦ CIBLES DE PROGRESSION ("priorityProgression") : Ce sont les Mouvements Rois. Priorité ABSOLUE. Ils DOIVENT être placés en premier dans la séance. IMPORTANT : Vous devez définir le champ "isPriority" à TRUE pour ces exercices spécifiques.
+    ◦ AUTRES EXERCICES A INCLURE ("exercisesToInclude") : Ce sont des mouvements d'assistance ou d'hypertrophie. Le champ "isPriority" doit être à FALSE pour ceux-ci.
+    ◦ Dans le cas des exercices d'assistance et d'hypertrophie, ne proposez que des exercices permettant une réelle surcharge progressive, et dont le facteur limitant n'est pas un autre groupe musculaire que le groupe musculaire cible.
     ◦ Incluez le concept de SFR (Stimulus to Fatigue Ratio) pour la sélection d'exercices et suivant le niveau de l'athlète, en vue d'une augmentation future potentielle du volume d'entraînement sur les groupes musculaires qui font l'objet d'une spécialisation.
-    ◦ Les exercices ciblant les groupes musculaires faisant l'objet d'un focus/spécialisation doivent être effectués en premier dans la séance (ou juste après les "exercices de force").
+    ◦ Les exercices ciblant les groupes musculaires faisant l'objet d'un focus/spécialisation doivent être effectués en premier dans la séance (ou juste après les "exercices de force"/exercices prioritaires).
     ◦ Optimisez l'ordre des séances et des exercices en fonction des objectifs et focus pour éviter les effets d'interférences qui réduiraient la performance.
     ◦ Evitez au maximum d'inclure plus de 6-7 exercices par séance.
     2. Gestion du Volume d'Entraînement :

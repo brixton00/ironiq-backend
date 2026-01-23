@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 // Niveau 4 : exercice
 const exerciseSchema = mongoose.Schema({
   name: { type: String, required: true },
+  isPriority: { type: Boolean, required: true },
   sets: { type: Number, required: true },
   reps: { type: String, required: true },
   load: { type: Number, default: 0 }, 

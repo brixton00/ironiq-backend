@@ -14,10 +14,11 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 // DÉFINITION DES SCHÉMAS ZOD
 const ExerciseSchema = z.object({
   exercise_name: z.string().describe("Le nom spécifique et standardisé de l'exercice."),
+  isPriority: z.boolean().describe("Indique si l'exercice est une cible de progression principale ou non."),
   sets: z.number().describe("Nombre de séries de travail, compris entre 2 et 6"),
-  reps: z.string().describe("Plage de répétitions cible, ex: '🎯 8-12 reps' ou '🎯 5 reps'"),
+  reps: z.string().describe("Plage de répétitions cible, ex: '8-12 reps 🎯' ou '5 reps🎯'"),
   intensity_target: z.number().describe("L'intensité cible, ex: '8'"),
-  percentage_1rm: z.number().nullable().describe("Pourcentage du 1RM pour les exercices pertinents, ex: '0.75' pour 75% de la charge maximale"),
+  percentage_1rm: z.number().nullable().describe("Pourcentage du 1RM pour les exercices qui sont cibles de progression, ex: '0.75' pour 75% de la charge maximale"),
   set_type: z.string().nullable().describe("'Top Set(s)' ou 'Back-off Set(s)', uniquement si pertinence de programmation"),
   load: z.number().nullable().describe("Charge calculée en kg, d'après % du 1RM et/ou RPE si possible, sinon 'null'"),
   rest: z.number().describe("Intervalle de repos en secondes"),
@@ -104,6 +105,7 @@ const generateProgram = async (req, res) => {
       focus: session.session_focus,    
       exercises: session.exercises_list.map(ex => ({ 
         name: ex.exercise_name,
+        isPriority: ex.isPriority,
         sets: ex.sets,
         reps: ex.reps,
         load: ex.load || null,
@@ -356,6 +358,7 @@ const generateNextWeek = async (req, res) => {
           focus: session.session_focus,    
           exercises: session.exercises_list.map(ex => ({ 
             name: ex.exercise_name,
+            isPriority: ex.isPriority,
             sets: ex.sets,
             reps: ex.reps,
             load: ex.load || null,
