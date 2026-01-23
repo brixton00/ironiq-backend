@@ -24,24 +24,25 @@ const getTemplates = async (req, res) => {
   }
 };
 
-// endpoint route POST /log-dession
+// endpoint route POST /log-session
 const logSession = async (req, res) => {
   try {
-    // 1. AJOUT de weekNumber dans la déstructuration (envoyé par le front)
+    // 1. Réception des données (Note : le front envoie 'dayName')
     const { programId, dayName, exercises, dayIndex, weekNumber } = req.body;
 
     // Validation basique
-    if (!weekNumber) {
+    if (!weekNumber && weekNumber !== 0) { // check strict pour accepter 0
       return res.status(400).json({ result: false, error: "WeekNumber manquant" });
     }
 
-    // 2. Sauvegarde du Log (Historique) - inchangé
+    // 2. Sauvegarde du Log (Historique)
+    // ⚠️ CORRECTIF ICI : On mappe 'dayName' (reçu) vers 'sessionName' (attendu par le modèle)
     const newLog = new WorkoutLog({
       user: req.user._id,
       program: programId,
-      dayName: dayName,
+      sessionName: dayName, // <--- C'était ici le bug !
       exercises: exercises,
-      weekNumber: weekNumber, // Important pour le suivi
+      weekNumber: weekNumber,
       date: new Date()
     });
     await newLog.save();
@@ -58,7 +59,6 @@ const logSession = async (req, res) => {
     }
 
     // 🛡️ ANTI-ICHEAT & VALIDATION
-    // On utilise 'completedSessions' qui existe dans le Schema (voir models/programs.js)
     if (!activeWeek.completedSessions.includes(dayIndex)) {
       activeWeek.completedSessions.push(dayIndex);
     }
@@ -70,14 +70,14 @@ const logSession = async (req, res) => {
       activeWeek.isWeekComplete = true; // On persiste l'état final sur la SEMAINE
     }
 
-    // Important : on marque l'objet modifié pour que Mongoose détecte le changement dans le tableau
+    // Important : on marque l'objet modifié pour que Mongoose détecte le changement
     program.markModified('mesocycle'); 
     await program.save();
 
     res.json({ result: true, message: 'Séance enregistrée', isWeekComplete });
 
   } catch (error) {
-    console.error("Erreur logSession:", error); // Ajout d'un log pour debugger sur Railway
+    console.error("Erreur logSession:", error);
     res.status(500).json({ result: false, error: error.message });
   }
 };
