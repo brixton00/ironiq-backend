@@ -27,40 +27,57 @@ const getTemplates = async (req, res) => {
 // endpoint route POST /log-dession
 const logSession = async (req, res) => {
   try {
-    // On récupère dayIndex depuis le frontend (ajouté à l'étape 3)
-    const { programId, dayName, exercises, dayIndex } = req.body;
+    // 1. AJOUT de weekNumber dans la déstructuration (envoyé par le front)
+    const { programId, dayName, exercises, dayIndex, weekNumber } = req.body;
 
-    // 1. Sauvegarde du Log (Historique)
+    // Validation basique
+    if (!weekNumber) {
+      return res.status(400).json({ result: false, error: "WeekNumber manquant" });
+    }
+
+    // 2. Sauvegarde du Log (Historique) - inchangé
     const newLog = new WorkoutLog({
       user: req.user._id,
       program: programId,
       dayName: dayName,
       exercises: exercises,
+      weekNumber: weekNumber, // Important pour le suivi
       date: new Date()
     });
     await newLog.save();
 
-    // 2. Mise à jour sécurisée du Programme
+    // 3. Mise à jour du Programme
     const program = await Program.findById(programId);
+    if (!program) return res.status(404).json({ result: false, error: "Programme introuvable" });
 
-    // 🛡️ ANTI-ICHEAT : On ajoute l'index SEULEMENT s'il n'existe pas déjà
-    // $addToSet de MongoDB ferait pareil, mais ici on le fait en JS pour vérifier la longueur ensuite
-    if (!program.completedDays.includes(dayIndex)) {
-      program.completedDays.push(dayIndex);
+    // RECHERCHE DE LA SEMAINE ACTIVE
+    const activeWeek = program.mesocycle.weeks.find(w => w.weekNumber === weekNumber);
+
+    if (!activeWeek) {
+      return res.status(404).json({ result: false, error: "Semaine introuvable dans le programme" });
+    }
+
+    // 🛡️ ANTI-ICHEAT & VALIDATION
+    // On utilise 'completedSessions' qui existe dans le Schema (voir models/programs.js)
+    if (!activeWeek.completedSessions.includes(dayIndex)) {
+      activeWeek.completedSessions.push(dayIndex);
     }
 
     // Vérification : La semaine est finie si le nombre de jours UNIQUES validés >= Fréquence
     let isWeekComplete = false;
-    if (program.completedDays.length >= program.frequency) {
+    if (activeWeek.completedSessions.length >= program.frequency) {
       isWeekComplete = true;
-      program.isWeekComplete = true; // On persiste l'état final
+      activeWeek.isWeekComplete = true; // On persiste l'état final sur la SEMAINE
     }
 
+    // Important : on marque l'objet modifié pour que Mongoose détecte le changement dans le tableau
+    program.markModified('mesocycle'); 
     await program.save();
 
     res.json({ result: true, message: 'Séance enregistrée', isWeekComplete });
 
   } catch (error) {
+    console.error("Erreur logSession:", error); // Ajout d'un log pour debugger sur Railway
     res.status(500).json({ result: false, error: error.message });
   }
 };
