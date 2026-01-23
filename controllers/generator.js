@@ -8,7 +8,7 @@ const {
   buildInitialSystemPrompt, 
   buildNextWeekUserPrompt, 
   buildNextWeekSystemPrompt 
-} = require('../modules/aiPrompts');
+} = require('../modules/prompts');
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // DÉFINITION DES SCHÉMAS ZOD
